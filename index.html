@@ -2563,6 +2563,30 @@ sevenLesson(5,[
   ])
 ]);
 
+sevenLesson(6,[
+  ["نقفز إلى اليمين",["warm","frog","fourteen","twelve","seventeen","nine"]],
+  ["نرسم خطّ الطرح",["more","vertical","train"]],
+  ["نقرأ مسار الرجوع",["diagram","transfer"]]
+],"حطّوا قطعة عند ١٢ على خطّ أعداد يبدأ بالصفر يمينًا. خلوه يرجع ٣ قفزات يمينًا.",[
+  arithGame("warm","أراجع العدّ التنازلي","countDown",[downStep(11,2,"ball")]),
+  arithGame("frog","ضفدع يرجع من ١٢","countDown",[downLine(12,3,{marker:"frog"})]),
+  arithGame("fourteen","أرجع سبع قفزات","countDown",[downLine(14,7)]),
+  arithGame("twelve","أرجع أربع قفزات","countDown",[downLine(12,4)]),
+  arithGame("seventeen","أرجع تسع قفزات","countDown",[downLine(17,9)]),
+  arithGame("nine","أرجع من تسعة","countDown",[downLine(9,3)]),
+  arithGame("more","أطرح على الخطّ","countDown",[downLine(14,6)]),
+  arithGame("vertical","خطّ الأعداد والطرح العمودي","countDown",arithMany([[8,3],[16,7]],{op:minus,mode:"line",vertical:true,write:true})),
+  arithGame("train","عربة ترجع على السكة","countDown",[downLine(15,5,{marker:"train",theme:"rails"})]),
+  arithGame("diagram","أكتب جملة قفزات الرجوع","countDown",[
+    arithmeticExercise(17,6,{mode:"diagram",op:minus,fillFields:["b","c"]}),
+    arithmeticExercise(12,4,{mode:"diagram",op:minus,full:true})
+  ]),
+  arithGame("transfer","تحدّي الرجوع بأدوات جديدة","countDown",[
+    downLine(16,8,{marker:"rabbit",alt:{marker:"train"}}),
+    arithmeticExercise(13,6,{op:minus,clue:"تَخَيَّلْ قَفَزَاتِ الْعَرَبَةِ."})
+  ])
+]);
+
 
 const wait = ms => new Promise(resolve => setTimeout(resolve,ms));
 const retryObjects = { pencil:"bread", sharpener:"egg", eraser:"date", date:"pencil", egg:"bread" };
