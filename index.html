@@ -3399,7 +3399,7 @@ class HundredRound {
   operationTrays(){
     const {r,p}=this, all=p.transfers.map(list=>list.length);
     const moving=p.phase==="column"&&!this.visible;
-    const active=moving?p.column:undefined;
+    const active=moving||this.s.model?p.column:undefined;
     if(r.op<0){
       return `<div class="pv-op-trays"><p class="pv-clue">أَشْطُبُ مِنَ الصِّينِيَّةِ</p>
         ${this.pieces(pvParts(r.a),{source:moving,used:p.transfers,active,takeItem:r.takeItem})}</div>`;
@@ -3704,7 +3704,21 @@ class HundredRound {
       const el=g.board.querySelector(".pv-op-cell.current,.pv-op-trays .pv-focus,.pv-equation");
       g.flash(el);
       if(reason==="اختلطت المنازل")await say(hundredSpeech.mixed);
-      else if(model||reason===undefined)await this.readNumber(this.value());
+      else if(model&&r.visual){
+        const [ones,tens]=pvParts(r.b), needs=[ones,tens], start=pvParts(r.a);
+        for(const col of [0,1]){
+          p.column=col;
+          for(let i=0;i<needs[col]&&g.current(epoch);i++){
+            if(p.transfers[col].includes(i))continue;
+            p.transfers[col].push(i);g.draw();effect("land");
+            const count=start[col]+r.op*p.transfers[col].length;
+            await Promise.all([this.readNumber(count,{enqueue:true}),pvPause(130)]);
+          }
+          if(!g.current(epoch))return;
+          p.subtotals[col]=pvParts(r.c)[col];
+        }
+        await this.readNumber(r.c,{enqueue:true});
+      }else if(model||reason===undefined)await this.readNumber(this.value());
       return;
     }
     const n=r.target,[ones,tens]=pvParts(n);
@@ -4129,6 +4143,21 @@ pvLesson(9,5,[
       op:-1,item:"orange",takeItem:"apple",visual:true,columns:true,prompt:"كَمْ بُرْتُقَالَةً فِي السَّلَّةِ؟"})
   ]),
   pvGame("transfer","تحدّي حزم البيض والخرز","columns100",[nineTake(54,22,"egg"),pvOp(86,52,{op:-1,vertical:true})])
+]);
+
+pvLesson(9,6,[
+  ["نتدرّب على الطرح",["first","vertical","zero","machine","more","match"]],
+  ["نتتبّع الناتج من خطوة لخطوة",["chain"]],
+  ["تحدّي أشياء البيت",["transfer"]]
+],"حطّوا ٣٢ قلمًا أو حبّة، وشيلوا عشرة ثم اسألوه كيف يعرف الباقي بدون ما يعدّ من البداية.",[
+  pvGame("first","أطرح من خمسة وسبعين وأربعين","subtract100",nineMinus([[75,30],[40,10],[56,24]])),
+  pvGame("vertical","أطرح من الآحاد والعشرات","columns100",nineMinus([[78,7],[44,12],[60,30]],{columns:true})),
+  pvGame("zero","أطرح الكمية كلها","subtract100",nineMinus([[65,65],[32,10],[99,88]])),
+  pvGame("machine","آلة ناقص اثني عشر","subtract100",[24,34,44,54,64].map(a=>pvOp(a,12,{op:-1,machine:true}))),
+  pvGame("more","أطرح وأكتب الناتج","subtract100",nineMinus([[46,5],[73,51],[77,33]])),
+  pvGame("match","أصل العملية بالناتج","subtract100",[64,56,45].map(a=>nineBin(a,34,-1,[30,22,11]))),
+  pvGame("chain","ثلاث خطوات على الطريق","subtract100",[[87,24],[63,20],[43,13]].map(([a,b])=>pvOp(a,b,{op:-1,machine:true}))),
+  pvGame("transfer","تحدّي صينية التمر","subtract100",[nineTake(57,33,"date"),nineBin(78,52,-1,[26,16,36])])
 ]);
 
 
