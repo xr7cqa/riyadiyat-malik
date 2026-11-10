@@ -2587,6 +2587,36 @@ sevenLesson(6,[
   ])
 ]);
 
+const factTable=(pairs,axes,op)=>pairs.map(([a,b])=>arithRound(a,b,{mode:"table",axes,op,
+  alternate:arithRound(a,axes[1][(axes[1].indexOf(b)+1)%axes[1].length],{mode:"table",axes,op})}));
+const factBins=(pairs,op,from,to)=>pairs.map(([a,b],i)=>arithRound(a,b,{mode:"bin",op,
+  options:sevenRange(from,to).sort((x,y)=>Math.abs(a+op*b-x)-Math.abs(a+op*b-y)),
+  alternate:arithRound(pairs[(i+1)%pairs.length][0],pairs[(i+1)%pairs.length][1],{mode:"bin",op,options:sevenRange(from,to)})}));
+const addAxes=[sevenRange(0,8),sevenRange(0,8)];
+sevenLesson(7,[
+  ["نبدّل المجموعتين",["warm","strip","swap-nine","swap-eight","pairs","vertical"]],
+  ["نملأ جدول الجمع",["missing","missing-vertical","table","more","more-vertical"]],
+  ["نفرز بطاقات الحقائق",["small-table","bins","transfer"]]
+],"خلّوه يضمّ ٧ مكعّبات و٥، ثم يبدّل مكان المجموعتين ويعدّ مرة ثانية.",[
+  arithGame("warm","مكعبات حمراء وزرقاء","join",[arithmeticExercise(7,5,{mode:"join",item:"cube",other:"tealCube"})]),
+  arithGame("strip","شريط الأزرق والوردي","join",[arithmeticExercise(8,6,{mode:"join",item:"tealCube",other:"pinkCube"})]),
+  arithGame("swap-nine","أبدّل ٩ و٧","fact",[arithmeticExercise(9,7,{mode:"swap",item:"tealCube",other:"pinkCube"})]),
+  arithGame("swap-eight","أبدّل ٨ و٣","fact",[arithmeticExercise(8,3,{mode:"swap",item:"tealCube",other:"pinkCube"})]),
+  arithGame("pairs","أجمع الأزواج","fact",arithMany([[9,7],[7,9],[7,7],[8,3],[3,8],[6,5]],{})),
+  arithGame("vertical","حقائق الجمع عموديًّا","fact",arithMany([[9,8],[5,7],[9,5],[7,4]],{vertical:true})),
+  arithGame("missing","أكمل حقيقة الجمع","missing",[[9,3,"b"],[5,6,"a"],[5,8,"b"]].map(([a,b,blank])=>arithmeticExercise(a,b,{blank}))),
+  arithGame("missing-vertical","فراغ تحت العدد","missing",arithMany([[5,5],[2,9],[7,7]],{blank:"b",vertical:true})),
+  arithGame("table","جدول الجمع من ٠ إلى ٨","fact",factTable([[0,7],[1,8],[2,6],[3,5],[4,8],[5,6],[6,7],[7,8],[8,8]],addAxes,plus)),
+  arithGame("more","أحسب حقائق جديدة","fact",arithMany([[9,8],[9,6],[8,8],[7,8],[8,9],[6,8],[8,7]],{})),
+  arithGame("more-vertical","أحسب تحت الخطّ","fact",arithMany([[9,9],[6,9],[9,7],[8,7],[8,8],[8,9]],{vertical:true})),
+  arithGame("small-table","جدول الحقائق الناقصة","fact",factTable([[6,5],[7,6],[8,7]],[[6,7,8],[5,6,7]],plus)),
+  arithGame("bins","صناديق النواتج من ١١ إلى ١٨","fact",factBins([[9,3],[4,8],[6,6],[6,5],[6,7],[7,7],[7,8],[8,8],[8,9],[9,9]],plus,11,18)),
+  arithGame("transfer","تحدّي مجموعات الملاعق","fact",[
+    arithmeticExercise(6,7,{mode:"swap",item:"spoon",other:"pencil",alt:{item:"date",other:"egg"}}),
+    arithmeticExercise(7,8,{mode:"write"})
+  ])
+]);
+
 
 const wait = ms => new Promise(resolve => setTimeout(resolve,ms));
 const retryObjects = { pencil:"bread", sharpener:"egg", eraser:"date", date:"pencil", egg:"bread" };
