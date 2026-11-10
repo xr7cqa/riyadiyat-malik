@@ -2673,6 +2673,37 @@ sevenLesson(8,[
   ])
 ]);
 
+const factsOf=(x,y)=>[[x,y,plus],[y,x,plus],[x+y,y,minus],[x+y,x,minus]];
+function familyFacts(x,y,config={}) {
+  return factsOf(x,y).map(([a,b,op],i)=>arithRound(a,b,{mode:"family",op,family:[x,y,x+y],theme:config.theme,
+    blank:config.blanks?.[i] || "c",
+    alternate:arithRound(...factsOf(x+1,y)[i].slice(0,2),{mode:"family",op,family:[x+1,y,x+y+1],theme:config.theme,blank:config.blanks?.[i] || "c"})}));
+}
+function familyFree(x,y,theme="house") {
+  return arithRound(x,y,{mode:"familyFree",full:true,family:[x,y,x+y],theme,
+    alternate:arithRound(x+1,y,{mode:"familyFree",full:true,family:[x+1,y,x+y+1],theme})});
+}
+sevenLesson(9,[
+  ["نتعرّف على العائلة",["warm","flowers","family-eleven","family-ten","family-fifteen","family-fourteen"]],
+  ["نكمل حقائق العائلة",["fill-thirteen","fill-fourteen","fill-twelve","fill-seventeen"]],
+  ["نبني بيت الأعداد",["build-thirteen","build-fifteen","house","transfer"]]
+],"كوّنوا مجموعتين من ٧ و٥ قطع. اكتبوا مع مالك حقيقتين للجمع وحقيقتين للطرح من نفس القطع.",[
+  arithGame("warm","أراجع حقيقة طرح","remove",[takeAway(12,5,"flower")]),
+  arithGame("flowers","مثلّث الورد والأعداد","fact",familyFacts(7,5,{theme:"triangle"})),
+  arithGame("family-eleven","عائلة ٤ و٧ و١١","fact",familyFacts(4,7,{theme:"triangle"})),
+  arithGame("family-ten","عائلة ٦ و٤ و١٠","fact",familyFacts(6,4)),
+  arithGame("family-fifteen","عائلة ٨ و٧ و١٥","fact",familyFacts(8,7)),
+  arithGame("family-fourteen","عائلة ٩ و٥ و١٤","fact",familyFacts(9,5)),
+  arithGame("fill-thirteen","أكمل حقائق ٦ و٧","fact",familyFacts(6,7,{blanks:["b","a","b","c"]})),
+  arithGame("fill-fourteen","أكمل حقائق ٦ و٨","fact",familyFacts(6,8,{blanks:["a","b","a","c"]})),
+  arithGame("fill-twelve","أكمل حقائق ٣ و٩","fact",familyFacts(3,9,{blanks:["b","c","a","b"]})),
+  arithGame("fill-seventeen","أكمل حقائق ٨ و٩","fact",familyFacts(8,9,{blanks:["a","b","b","c"]})),
+  arithGame("build-thirteen","أكوّن حقائق ٨ و٥ بنفسي","fact",[familyFree(8,5,"triangle")]),
+  arithGame("build-fifteen","أكوّن حقائق ٦ و٩ بنفسي","fact",[familyFree(6,9)]),
+  arithGame("house","بيت الجزءين والكل","fact",[familyFree(6,8)]),
+  arithGame("transfer","تحدّي عائلة الأقلام","fact",[familyFree(7,6)])
+]);
+
 
 const wait = ms => new Promise(resolve => setTimeout(resolve,ms));
 const retryObjects = { pencil:"bread", sharpener:"egg", eraser:"date", date:"pencil", egg:"bread" };
