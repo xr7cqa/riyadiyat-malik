@@ -3049,7 +3049,7 @@ const pvTick=(n)=>n==null?'<span class="pv-question">؟</span>':numberLabel(n);
 const pvSign=(relation)=>`<bdi dir="ltr" class="pv-symbol" aria-label="${relation>0?"أكبر من":relation<0?"أصغر من":"يساوي"}">${relation>0?"&lt;":relation<0?"&gt;":"="}</bdi>`;
 const pvBearDots=[[15,22],[17,13],[24,10],[30,14],[35,20],[50,18],[65,20],[70,14],[77,10],[84,14],[85,22],[80,29],[87,39],[85,52],[73,61],[71,77],[62,85],[49,81],[38,85],[29,77],[26,61],[14,50]];
 const pvStrip = n=>`<div class="pv-num" dir="ltr" data-read-number="${n}" aria-label="${eastern(n)}">${String(n).split("").map((d,i,a)=>
-  `<bdi dir="ltr" data-place="${i===a.length-1?"ones":"tens"}">${eastern(d)}</bdi>`).join("")}</div>`;
+  `<bdi dir="ltr" data-place="${["ones","tens","hundreds"][a.length-1-i]}">${eastern(d)}</bdi>`).join("")}</div>`;
 function pvPack(kind) {
   const repeated=(n,render)=>Array.from({length:n},(_,i)=>render(i)).join("");
   if(kind==="pencil") return `<svg viewBox="0 0 54 54" aria-hidden="true">
@@ -3119,7 +3119,7 @@ class HundredRound {
       if(n>20&&n<100&&n%10){
         light("ones");
         timer=setTimeout(()=>light("tens"),1000*(pvVoiceTiming[n]??seconds*.48)/rate);
-      }else light(n<10?"ones":"tens");
+      }else light(n<10?"ones":n===100?"hundreds":"tens");
     }});
     clearTimeout(timer);
     if(game.alive&&game.state===state)clear();
@@ -3194,7 +3194,7 @@ class HundredRound {
     const r=this.r,p=this.p, n=r.target;
     const board=r.mode==="read" ? pvBtn("read",pvStrip(n),"pv-read-card",n,'aria-label="اسمع العدد"') :
       r.mode==="hear" ? `<p class="pv-clue">${numberVoice(n)}</p>` :
-      ["build","decompose","swap"].includes(r.mode)?pvStrip(p.swapped?r.otherNumber||n:n):
+      ["build","decompose","swap"].includes(r.mode)?pvStrip(p.demo?.number??(p.swapped?r.otherNumber||n:n)):
       this.visible?pvStrip(n):"";
     const shape=p.demo?.number??(r.mode==="build"&&p.phase==="build"?p.qty[0]+10*p.qty[1]:
       r.mode==="swap"&&p.swapped?r.otherNumber||n:n);
@@ -3438,6 +3438,31 @@ pvLesson(8,1,[
   pvGame("transfer","تحدّي حزم الأقلام وعقود الخرز","tens100",[
     pvRound("build",30,{tensOnly:true,item:"pencil",fields:["n"],alternate:{target:40,item:"bead"}}),
     pvRound("identify",60,{item:"bead",fields:["n"],alternate:{target:70,item:"pencil"}})
+  ])
+]);
+
+const eightFields=["ones","tens","n"];
+const eightSpot=(mode,n,item="cube",details={})=>pvRound(mode,n,{item,fields:eightFields,...details});
+pvLesson(8,2,[
+  ["آحادٌ وعَشَرَاتٌ",["build","erasers","rabbits","chickens","chicks","blocks"]],
+  ["نبدّل الأدوات",["pencils","beads","squares"]],
+  ["نقدّر ونتحقق",["balls","transfer"]]
+],"خلّوه يحوّط عشرة من ١٢ ممحاة أو قلم، ويقول كم بقي خارج المجموعة.",[
+  pvGame("build","أكوّن خمسة عشر","place100",[
+    eightSpot("build",15,"cube",{alternate:{target:16,item:"pencil"}})
+  ]),
+  ...[["erasers","المحايات",12,"eraser"],["rabbits","الأرانب",14,"rabbit"],
+    ["chickens","الدجاج",13,"chicken"],["chicks","الكتاكيت",17,"chick"]].map(([id,label,n,item])=>
+    pvGame(id,"أحوّط عشرة من "+label,"place100",[eightSpot("bundle",n,item)])),
+  ...[["blocks","المكعبات",14,"cube"],["pencils","الأقلام",16,"pencil"],
+    ["beads","الخرز",13,"bead"],["squares","المربعات",18,"square"]].map(([id,label,n,item])=>
+    pvGame(id,"أكتب منازل "+label,"place100",[eightSpot("identify",n,item)])),
+  pvGame("balls","أقدّر الكرات ثم أعدّها","estimate100",[
+    pvRound("estimate",16,{item:"ball",colors:[7],options:[10,20],alternate:{target:15,colors:[8]}})
+  ]),
+  pvGame("transfer","تحدّي حزم الأقلام وحبات التمر","place100",[
+    eightSpot("build",17,"pencil",{alternate:{target:14,item:"bead"}}),
+    eightSpot("identify",19,"date",{alternate:{target:16,item:"egg"}})
   ])
 ]);
 
