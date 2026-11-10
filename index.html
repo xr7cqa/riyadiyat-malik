@@ -2462,6 +2462,26 @@ sevenLesson(2,[
   ])
 ]);
 
+sevenLesson(3,[
+  ["نقفز عند البركة",["warm","frog","nine","six","ten","eight"]],
+  ["نرسم القفزات",["long","vertical"]],
+  ["نكتب الجملة من الخط",["diagram","transfer"]]
+],"ارسموا خطّ أعداد يبدأ من اليمين. حطّوا قطعة عند ٨ وخلوه يحرّكها ٣ خطوات يسارًا.",[
+  arithGame("warm","أراجع العدّ التصاعدي","countUp",[countedAdd(6,2,"egg")]),
+  arithGame("frog","أقفز مع الضفدع","countUp",[arithmeticExercise(8,3,{mode:"line",marker:"frog"})]),
+  arithGame("nine","أقفز خمس خطوات","countUp",[arithmeticExercise(9,5,{mode:"line"})]),
+  arithGame("six","أقفز ست خطوات","countUp",[arithmeticExercise(6,6,{mode:"line"})]),
+  arithGame("ten","أقفز من العشرة","countUp",[arithmeticExercise(10,7,{mode:"line"})]),
+  arithGame("eight","أقفز من ثمانية","countUp",[arithmeticExercise(8,7,{mode:"line"})]),
+  arithGame("long","قفزات طويلة","countUp",arithMany([[9,9],[10,9]],{mode:"line"})),
+  arithGame("vertical","الخطّ والجمع العمودي","countUp",arithMany([[6,5],[8,6],[9,7]],{mode:"line",vertical:true,write:true})),
+  arithGame("diagram","أكتب جملة القفزات","countUp",arithMany([[7,6],[9,5]],{mode:"diagram",full:true})),
+  arithGame("transfer","تحدّي العربة على الخط","countUp",[
+    arithmeticExercise(7,4,{mode:"line",marker:"train",alt:{marker:"rabbit"}}),
+    arithmeticExercise(8,6,{mode:"write",clue:"تَخَيَّلْ قَفَزَاتِ الْعَرَبَةِ."})
+  ])
+]);
+
 
 const wait = ms => new Promise(resolve => setTimeout(resolve,ms));
 const retryObjects = { pencil:"bread", sharpener:"egg", eraser:"date", date:"pencil", egg:"bread" };
