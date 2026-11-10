@@ -3501,8 +3501,10 @@ class HundredRound {
     if(r.mode==="family")return this.familyBoard();
     if(r.mode==="puzzle"){
       const n=p.values.n;
-      return `<div class="pv-clue pv-focus" dir="rtl">٤٣ + <bdi dir="ltr">٥${n==null?"؟":eastern(n)}</bdi> =
-        <bdi dir="ltr">٩${n==null?"؟":eastern(n+3)}</bdi></div>`;
+      return `<div class="arith-equation horizontal pv-equation pv-focus" dir="rtl">
+        <span class="arith-term" data-term="a">${pvStrip(43)}</span><bdi class="arith-symbol" dir="ltr">+</bdi>
+        <bdi class="arith-term" data-term="b" dir="ltr">٥${n==null?"؟":eastern(n)}</bdi><bdi class="arith-symbol" dir="ltr">=</bdi>
+        <bdi class="arith-term" data-term="c" dir="ltr">٩${n==null?"؟":eastern(n+3)}</bdi></div>`;
     }
     if(r.bin)return this.binBoard();
     return `${r.rows?this.extrasBoard():""}${this.matrixBoard()}${r.machine?this.machineBoard():""}${this.equation()}
@@ -3587,7 +3589,8 @@ class HundredRound {
     if(p.phase==="column"&&this.r.visual){this.transfer(piece,column);return;}
     if(p.phase!=="build"||p.demo||![0,1].includes(piece))return;
     if(column!==undefined&&column!==piece){void this.game.wrong("اختلطت المنازل");return;}
-    if((this.r.tensOnly&&piece===0)||p.qty[piece]>=(piece===0?9:10))return;
+    if((this.r.tensOnly&&piece===0)||p.qty[piece]>=(piece===0?9:10)||
+      p.qty[0]+10*p.qty[1]+(piece===1?10:1)>100)return;
     p.qty[piece]++;p.sequence.push(piece);
     effect("land");this.game.draw();
     const n=p.qty[0]+p.qty[1]*10;
@@ -4194,6 +4197,69 @@ pvLesson(9,7,[
   pvGame("transfer","تحدّي أشياء البيت","storyMoney",[
     nineStory(75,30,"مَعَكَ خَمْسَةٌ وَسَبْعُونَ رِيَالًا، دَفَعْتَ ثَلَاثِينَ.",{op:-1,prompt:"كَمْ رِيَالًا بَقِيَ؟"}),
     pvOp(42,13,{vertical:true,item:"pencil"})
+  ])
+]);
+
+pvLesson(9,8,[
+  ["نراجع الجمع والطرح",["add","take","small","again","vertical","arrows"]],
+  ["نصل العملية بالناتج",["match","zero","chain"]],
+  ["نتبع الأنماط",["pattern","transfer"]]
+],"اكتبوا ٣٨ + ١١ و٨٢ − ٣٠، وخلوه يشرح أي خطوة يحسبها أولًا.",[
+  pvGame("add","أجمع ثمانية وثلاثين وأحد عشر","add100",[pvOp(38,11)]),
+  pvGame("take","أطرح ثلاثين من اثنين وثمانين","subtract100",[pvOp(82,30,{op:-1})]),
+  pvGame("small","أجمع ستة واثني عشر","add100",[pvOp(12,6)]),
+  pvGame("again","أطرح ثلاثة عشر من ثلاثة وسبعين","subtract100",[pvOp(73,13,{op:-1})]),
+  pvGame("vertical","أجمع وأطرح رأسيًا","columns100",[
+    pvOp(29,50,{columns:true}),...nineMinus([[59,14],[47,32],[90,20]],{columns:true})
+  ]),
+  pvGame("arrows","أجمع في الصف وأطرح في العمود","columns100",nineMatrix([[56,33],[42,10]],true)),
+  pvGame("match","أصل العملية بالناتج الصحيح","columns100",
+    [[24,30,1],[67,13,-1],[30,40,1],[85,15,-1],[51,10,1],[23,6,1]].map(([a,b,op])=>nineBin(a,b,op,[54,61,70,29]))),
+  pvGame("zero","أطرح الكمية كلها وأكتب الصفر","subtract100",[pvOp(19,19,{op:-1,machine:true})]),
+  pvGame("chain","آلات الجمع والطرح","columns100",[
+    pvOp(15,13,{machine:true}),pvOp(28,20,{op:-1,machine:true}),pvOp(53,16,{machine:true}),
+    pvOp(69,24,{op:-1,machine:true}),pvOp(76,24,{op:-1,machine:true}),pvOp(52,37,{machine:true})
+  ]),
+  pvGame("pattern","نمط زيادة اثني عشر ونقص أحد عشر","pattern100",[
+    ...ninePath(21,93,12,[21,33,45]),...ninePath(84,18,-11,[84,73,62])
+  ]),
+  pvGame("transfer","تحدّي صواني الأقلام والخرز","columns100",[nineTrays(42,35,"pencil"),nineTake(97,52,"bead")])
+]);
+
+const nineFamily=(family,op)=>pvRound("family",op>0?family[2]:family[0],{op,family});
+registerLesson(45,"مهرجان الحساب",[
+  ["تحدّي الآلات والنتائج",["match","tens","less","add","take","mix"]],
+  ["تحدّي الجمل الحسابية",["familyadd","familytake"]],
+  ["تحدّي الصواني",["trays","final"]]
+],"خلّوه يرتّب بطاقات ٢٣ و٣٦ و٥٩ في جملة جمع، ثم يجرّب جملة طرح بالأعداد نفسها.",[
+  pvGame("match","أصل العمليات بنتائج جديدة","columns100",
+    [[76,44,-1],[56,31,1],[74,12,1],[90,60,-1]].map(([a,b,op])=>nineBin(a,b,op,[32,87,86,30]))),
+  pvGame("tens","أجمع العشرات","add100",[pvOp(40,30)]),
+  pvGame("less","أطرح عشرات كاملة","subtract100",[pvOp(85,40,{op:-1})]),
+  pvGame("add","أجمع في المنازل","columns100",[pvOp(62,17,{columns:true})]),
+  pvGame("take","أطرح في المنازل","columns100",[pvOp(96,42,{op:-1,columns:true})]),
+  pvGame("mix","أجمع وأطرح","columns100",[pvOp(75,15,{op:-1}),pvOp(32,54)]),
+  pvGame("familyadd","أكوّن جملة جمع","add100",[nineFamily([23,36,59],1)]),
+  pvGame("familytake","أكوّن جملة طرح","subtract100",[nineFamily([22,46,68],-1)]),
+  pvGame("trays","أرتّب حزم التمر","columns100",[nineTrays(52,36,"date")]),
+  pvGame("final","أطرح من صينية الخرز","columns100",[nineTake(88,32,"bead")])
+]);
+registerLesson(46,"ركن الصواني",[["نتمرّن على أكثر خطوة احتاجت مساعدة",["add","subtract","columns"]]],
+  "أعيدوا المسألة التي ظهر فيها خلط، واستخدموا حزم أقلام وقطعًا مفردة.",[
+    pvGame("add","أجمع في صينيتين","add100",[nineTrays(30,20,"cube"),nineTrays(64,35,"pencil"),nineTrays(80,16,"bead")]),
+    pvGame("subtract","أطرح من صينية واحدة","subtract100",[nineTake(60,20,"apple"),nineTake(57,33,"cube"),nineTake(90,60,"bead")]),
+    pvGame("columns","أراجع العمود الذي أخطأت فيه","columns100",[nineTake(47,12,"pencil"),nineTake(73,52,"cube")])
+  ]);
+registerLesson(47,"بيت الألغاز",[
+  ["أجرّب أرقامًا ممكنة",["puzzle"]],
+  ["أكتشف العدد الناقص",["add","take"]],
+  ["أكوّن جملتين",["family"]]
+],"أعطوه بطاقات ٢٣ و٣٣ و٥٦، وخلوه يكوّن جملة جمع وجملتي طرح.",[
+  pvGame("puzzle","أضع رقمًا صحيحًا في الآحاد","columns100",[pvRound("puzzle",2)]),
+  pvGame("add","ما العدد الذي يزيد ستة وعشرين إلى سبعة وثمانين؟","add100",[nineMissing(26,61)]),
+  pvGame("take","ما العدد الذي نطرحه من تسعة عشر؟","subtract100",[nineMissing(19,8,{op:-1})]),
+  pvGame("family","أكوّن جمعًا وطرحًا من الأعداد نفسها","columns100",[
+    nineFamily([33,23,56],1),nineFamily([33,23,56],-1)
   ])
 ]);
 
@@ -5534,7 +5600,11 @@ function parentGate() {
 function explainError(error) {
   const {game,entered,expected} = error;
   const label = games[game]?.title || "";
-  if (["arithmetic","hundred"].includes(games[game]?.kind)) {
+  if (games[game]?.kind==="hundred") {
+    if(entered==="اختلطت المنازل")return `${label} · خلط الآحاد والعشرات عند النقل.`;
+    return `${label} · ${entered==null?"ترك فراغًا":"أجاب "+eastern(entered)}، والمطلوب ${eastern(expected)}.`;
+  }
+  if (games[game]?.kind==="arithmetic") {
     if(entered==="يمين" || entered==="يسار")return `${label} · قفز نحو ${entered==="يمين"?"اليمين":"اليسار"} في ${eastern(expected)}.`;
     return `${label} · ${entered==null?"ترك فراغًا":"أجاب "+eastern(entered)} في ${eastern(expected)}.`;
   }
